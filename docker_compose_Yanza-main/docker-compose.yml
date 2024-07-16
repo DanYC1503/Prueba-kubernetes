@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgre-container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dan
+      POSTGRES_DB: Uni_SQL
+    ports: 
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - docker_net
+
+  pgAdmin:
+    image: dangyan03/practica_docker_compose:pgadmin4-danYC
+    container_name: pdAdmin_Container
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com 
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports: 
+      - "4000:80"
+    depends_on:
+      - postgres
+    networks:
+      - docker_net
+      
+  microservice:
+    image: dangyan03/kubernetes:microservice
+    container_name: kubernetes-container
+    restart: always
+    ports:
+      - "8081:8080"
+  
+    depends_on:
+    #  - wildfly
+      - pgAdmin
+      - postgres
+    networks:
+      - docker_net
+networks:
+  docker_net:
